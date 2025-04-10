@@ -1,11 +1,13 @@
 name: myFirstWorkflow
 on: 
   push:
+    paths-ignore: 
+      .github/**    
     branches: 
       - master
   workflow_dispatch:
   schedule:
-    - cron: '38 12 * * 4'
+    - cron: '45 19 * * 4'
 jobs:
   MyFirstJob:
     runs-on: ubuntu-latest
