@@ -4,6 +4,8 @@ on:
     branches: 
       - master
   workflow_dispatch:
+  schedule:
+    - cron: '38 12 * * 4'
 jobs:
   MyFirstJob:
     runs-on: ubuntu-latest
