@@ -6,6 +6,19 @@ on:
     branches: 
       - master
   workflow_dispatch:
+    inputs: 
+      homedrive:
+        description: 'The home drive on this machine'
+        required: true
+      logLevel:
+        description: 'Log Detail Level'
+        default: 'info'
+        type: choice
+        options:
+        -  info
+        -  warning
+        -  error
+        -  debug
   schedule:
     - cron: '45 19 * * 4'
 jobs:
