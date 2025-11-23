@@ -30,7 +30,7 @@ jobs:
   MyFirstJob:
     runs-on: ubuntu-latest
     outputs:
-      ENVIRONMENT_NAME: ${{ steps.set-environment.outputs.ENVIRONMENT_NAME }}
+      ENVIRONMENT_NAME: ${{ steps.set-environment.outputs.environment_name }}
     steps:
       - run: echo "👋 Hello World!"
       - name: Checkout
@@ -57,12 +57,12 @@ jobs:
           else
             ENVIRONMENT_NAME="No Approvals No Pause"
           fi
-          echo "ENVIRONMENT_NAME=$ENVIRONMENT_NAME" >> $GITHUB_OUTPUTS
+          echo "environment_name=$ENVIRONMENT_NAME" >> $GITHUB_OUTPUTS
           
   GateWithEnvironment:
     runs-on: ubuntu-latest
     needs: MyFirstJob
-    environment: ${{ needs.MyFirstJob.outputs.ENVIRONMENT_NAME }}
+    environment: ${{ needs.MyFirstJob.outputs.environment_name }}
     steps:
       - run: |
           if [ "${{ github.event.inputs.is_paused }}" == "true" ]; then
