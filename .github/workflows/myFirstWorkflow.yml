@@ -57,7 +57,7 @@ jobs:
           else
             ENVIRONMENT_NAME="No Approvals No Pause"
           fi
-          echo "environment_name=$ENVIRONMENT_NAME" >> $GITHUB_OUTPUTS
+          echo "environment_name=$ENVIRONMENT_NAME" >> $GITHUB_OUTPUT"
           
   GateWithEnvironment:
     runs-on: ubuntu-latest
