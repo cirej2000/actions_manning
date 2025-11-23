@@ -3,6 +3,7 @@ on:
   push:
     branches: 
       - master
+      - environment_hot_cold_test
   workflow_dispatch:
 jobs:
   MyFirstJob:
@@ -18,3 +19,31 @@ jobs:
           echo "The repository ${{ github.repository }} contains the following files:"
           du -a
           
+  GateWithEnvironment:
+    runs-on: ubuntu-latest
+    needs: MyFirstJob
+    environment: Approvals Required - Pause
+    steps:
+      - run: echo "This job will run only after approval from the environment gate."
+      - name: Checkout
+        uses: actions/checkout@v6.0.0
+
+      - name: List files in the repo
+        run: |
+          echo "The repository ${{ github.repository }} contains the following files:"
+          du -a
+
+  GateWithoutApprovers:
+    runs-on: ubuntu-latest
+    needs: MyFirstJob
+    environment: No Approvals No Pause
+    steps:
+      - run: echo "This job will run without any approvals from the environment gate."
+      - name: Checkout
+        uses: actions/checkout@v6.0.0
+
+      - name: List files in the repo
+        run: |
+          echo "The repository ${{ github.repository }} contains the following files:"
+          du -a
+
