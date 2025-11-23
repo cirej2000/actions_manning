@@ -52,7 +52,7 @@ jobs:
             IS_PAUSED="${{ github.event.inputs.is_paused }}"
           fi
           echo "is_paused: $IS_PAUSED"
-          if [ "${{ IS_PAUSED }}" == "true" ]; then
+          if [ "$IS_PAUSED" == "true" ]; then
             ENVIRONMENT_NAME="Approvals Required - Pause"
           else
             ENVIRONMENT_NAME="No Approvals No Pause"
