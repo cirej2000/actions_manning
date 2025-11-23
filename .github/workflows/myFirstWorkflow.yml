@@ -44,7 +44,15 @@ jobs:
         id: set-environment
         shell: bash
         run: |
-          if [ "${{ github.event.inputs.is_paused }}" == "true" ]; then
+          # if the is_paused is empty or not set, default to false
+          if [ -z "${{ github.event.inputs.is_paused }}" ]; then
+            echo "is_paused is not set, defaulting to false"
+            IS_PAUSED="false"
+          else
+            IS_PAUSED="${{ github.event.inputs.is_paused }}"
+          fi
+          echo "is_paused: $IS_PAUSED"
+          if [ "${{ IS_PAUSED }}" == "true" ]; then
             ENVIRONMENT_NAME="Approvals Required - Pause"
           else
             ENVIRONMENT_NAME="No Approvals No Pause"
@@ -57,7 +65,7 @@ jobs:
     environment: ${{ needs.MyFirstJob.outputs.ENVIRONMENT_NAME }}
     steps:
       - run: |
-          if [ "${{ event.inputs.is_paused }}" == "true" ]; then
+          if [ "${{ 
             echo "This job paused and required approval to proceed."
           else
             echo "This job will run without approval."
