@@ -5,6 +5,19 @@ on:
       - master
       - environment_hot_cold_test
   workflow_dispatch:
+    inputs:
+#      homedrive:
+#        description: 'The home drive on this machine'
+#        required: true
+      logLevel:
+        description: 'Log Detail Level'
+        default: 'info'
+        type: choice
+        options:
+          -  info
+          -  warning
+          -  error
+          -  debug
 jobs:
   MyFirstJob:
     runs-on: ubuntu-latest
