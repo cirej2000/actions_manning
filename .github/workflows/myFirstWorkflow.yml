@@ -5,11 +5,18 @@ on:
       .github/**    
     branches: 
       - master
+      - environment_hot_cold_test
   workflow_dispatch:
-    inputs: 
-      homedrive:
-        description: 'The home drive on this machine'
+    inputs:
+      is_paused:
+        description: 'Is this workflow paused?'
         required: true
+        default: 'false'
+        type: choice
+        options:
+          - true
+          - false
+
       logLevel:
         description: 'Log Detail Level'
         default: 'info'
@@ -19,19 +26,55 @@ on:
         -  warning
         -  error
         -  debug
-  schedule:
-    - cron: '45 19 * * 4'
+
 jobs:
   MyFirstJob:
     runs-on: ubuntu-latest
-    
+    outputs:
+      ENVIRONMENT_NAME: ${{ steps.set-environment.outputs.environment_name }}
     steps:
       - run: echo "👋 Hello World!"
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6.0.0
 
       - name: List files in the repo
         run: |
           echo "The repository ${{ github.repository }} contains the following files:"
           du -a
+      - name: Set Environment
+        id: set-environment
+        shell: bash
+        run: |
+          # if the is_paused is empty or not set, default to false
+          if [ -z "${{ github.event.inputs.is_paused }}" ]; then
+            echo "is_paused is not set, defaulting to false"
+            IS_PAUSED="false"
+          else
+            IS_PAUSED="${{ github.event.inputs.is_paused }}"
+          fi
+          echo "is_paused: $IS_PAUSED"
+          if [ "$IS_PAUSED" == "true" ]; then
+            ENVIRONMENT_NAME="Approvals Required - Pause"
+          else
+            ENVIRONMENT_NAME="No Approvals No Pause"
+          fi
+          echo "environment_name=$ENVIRONMENT_NAME" >> $GITHUB_OUTPUT
           
+  GateWithEnvironment:
+    runs-on: ubuntu-latest
+    needs: MyFirstJob
+    environment: ${{ needs.MyFirstJob.outputs.environment_name }}
+    steps:
+      - run: |
+          if [ "${{ github.event.inputs.is_paused }}" == "true" ]; then
+            echo "This job paused and required approval to proceed."
+          else
+            echo "This job will run without approval."
+          fi
+      - name: Checkout
+        uses: actions/checkout@v6.0.0
+
+      - name: List files in the repo
+        run: |
+          echo "The repository ${{ github.repository }} contains the following files:"
+          du -a

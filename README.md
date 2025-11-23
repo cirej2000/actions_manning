@@ -1,2 +1,2 @@
 # actions_manning
-  Manning Publishing book exercises
+  Manning Publishing book exercises.
