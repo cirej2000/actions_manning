@@ -6,6 +6,14 @@ on:
       - environment_hot_cold_test
   workflow_dispatch:
     inputs:
+      is_paused:
+        description: 'Is this workflow paused?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - true
+          - false
 #      homedrive:
 #        description: 'The home drive on this machine'
 #        required: true
@@ -31,13 +39,28 @@ jobs:
         run: |
           echo "The repository ${{ github.repository }} contains the following files:"
           du -a
+      - name: Set Environment
+        id: set-environment
+        shell: bash
+        run: |
+          if [ "${{ github.event.inputs.is_paused }}" == "true" ]; then
+            ENVIRONMENT_NAME="Approvals Required - Pause"
+          else
+            ENVIRONMENT_NAME="No Approvals No Pause"
+          fi
+          echo "ENVIRONMENT_NAME=$ENVIRONMENT_NAME" >> $GITHUB_ENV
           
   GateWithEnvironment:
     runs-on: ubuntu-latest
     needs: MyFirstJob
-    environment: Approvals Required - Pause
+    environment: ${{ env.ENVIRONMENT_NAME }}
     steps:
-      - run: echo "This job will run only after approval from the environment gate."
+      - run: |
+          if [ "${{ event.inputs.is_paused }}" == "true" ]; then
+            echo "This job paused and required approval to proceed."
+          else
+            echo "This job will run without approval."
+          fi
       - name: Checkout
         uses: actions/checkout@v6.0.0
 
@@ -46,17 +69,4 @@ jobs:
           echo "The repository ${{ github.repository }} contains the following files:"
           du -a
 
-  GateWithoutApprovers:
-    runs-on: ubuntu-latest
-    needs: MyFirstJob
-    environment: No Approvals No Pause
-    steps:
-      - run: echo "This job will run without any approvals from the environment gate."
-      - name: Checkout
-        uses: actions/checkout@v6.0.0
-
-      - name: List files in the repo
-        run: |
-          echo "The repository ${{ github.repository }} contains the following files:"
-          du -a
 
